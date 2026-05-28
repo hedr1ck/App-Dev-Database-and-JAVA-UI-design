@@ -24,7 +24,10 @@ public class AircraftPanel extends JPanel {
 
         String[] columns = {
                 "Aircraft ID",
-                "Aircraft Name"
+                "Aircraft Name",
+                "Model",
+                "Total Seats"
+                
         };
 
         model = new DefaultTableModel(columns, 0) {
@@ -60,7 +63,9 @@ public class AircraftPanel extends JPanel {
                     """
                     SELECT
                         ID,
-                        Name
+                        Name,
+                        MakeModel,
+                        TotalSeats
                     FROM aircrafts
                     ORDER BY Name
                     """;
@@ -72,7 +77,9 @@ public class AircraftPanel extends JPanel {
                 model.addRow(
                         new Object[]{
                                 rs.getInt("ID"),
-                                rs.getString("Name")
+                                rs.getString("Name"),
+                                rs.getString("MakeModel"),
+                                rs.getString("TotalSeats")
                         }
                 );
             }
