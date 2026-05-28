@@ -6,8 +6,15 @@ public class ATSDashboardUI extends JFrame {
 
     private JPanel contentPanel;
     private CardLayout cardLayout;
+    private int roleID;
 
     public ATSDashboardUI() {
+        this(1);
+    }
+
+    public ATSDashboardUI(int roleID) {
+        this.roleID = roleID;
+
         setTitle("ATS Airline - Dashboard");
         setMinimumSize(new Dimension(1100, 650));
         setSize(1200, 700);
@@ -23,18 +30,25 @@ public class ATSDashboardUI extends JFrame {
         contentPanel.setOpaque(false);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(35, 35, 35, 35));
 
-        contentPanel.add(createDashboardPanel(), "Dashboard");
-        contentPanel.add(new SchedulePanel(), "Schedules");
-        contentPanel.add(new RoutePanel(), "Routes");
-        contentPanel.add(new AirportPanel(), "Airports");
-        contentPanel.add(new AircraftPanel(), "Aircrafts");
-        contentPanel.add(new UserPanel(), "Users");
-        contentPanel.add(new OfficePanel(), "Offices");
+        addPanels();
 
         JPanel sidebar = createSidebar();
 
         mainPanel.add(sidebar, BorderLayout.WEST);
         mainPanel.add(contentPanel, BorderLayout.CENTER);
+    }
+
+    private void addPanels() {
+        contentPanel.add(createDashboardPanel(), "Dashboard");
+        contentPanel.add(new SchedulePanel(roleID), "Schedules");
+        contentPanel.add(new RoutePanel(), "Routes");
+        contentPanel.add(new AirportPanel(), "Airports");
+        contentPanel.add(new AircraftPanel(), "Aircrafts");
+
+        if (roleID == 1) {
+            contentPanel.add(new UserPanel(), "Users");
+            contentPanel.add(new OfficePanel(), "Offices");
+        }
     }
 
     private JPanel createSidebar() {
@@ -72,8 +86,11 @@ public class ATSDashboardUI extends JFrame {
         routesBtn.addActionListener(e -> cardLayout.show(contentPanel, "Routes"));
         airportsBtn.addActionListener(e -> cardLayout.show(contentPanel, "Airports"));
         aircraftsBtn.addActionListener(e -> cardLayout.show(contentPanel, "Aircrafts"));
-        usersBtn.addActionListener(e -> cardLayout.show(contentPanel, "Users"));
-        officesBtn.addActionListener(e -> cardLayout.show(contentPanel, "Offices"));
+
+        if (roleID == 1) {
+            usersBtn.addActionListener(e -> cardLayout.show(contentPanel, "Users"));
+            officesBtn.addActionListener(e -> cardLayout.show(contentPanel, "Offices"));
+        }
 
         logoutBtn.addActionListener(e -> {
             new ATSLoginUI().setVisible(true);
@@ -89,10 +106,13 @@ public class ATSDashboardUI extends JFrame {
         sidebar.add(airportsBtn);
         sidebar.add(Box.createVerticalStrut(12));
         sidebar.add(aircraftsBtn);
-        sidebar.add(Box.createVerticalStrut(12));
-        sidebar.add(usersBtn);
-        sidebar.add(Box.createVerticalStrut(12));
-        sidebar.add(officesBtn);
+
+        if (roleID == 1) {
+            sidebar.add(Box.createVerticalStrut(12));
+            sidebar.add(usersBtn);
+            sidebar.add(Box.createVerticalStrut(12));
+            sidebar.add(officesBtn);
+        }
 
         sidebar.add(Box.createVerticalGlue());
         sidebar.add(logoutBtn);
@@ -103,13 +123,7 @@ public class ATSDashboardUI extends JFrame {
     private void refreshDashboard() {
         contentPanel.removeAll();
 
-        contentPanel.add(createDashboardPanel(), "Dashboard");
-        contentPanel.add(new SchedulePanel(), "Schedules");
-        contentPanel.add(new RoutePanel(), "Routes");
-        contentPanel.add(new AirportPanel(), "Airports");
-        contentPanel.add(new AircraftPanel(), "Aircrafts");
-        contentPanel.add(new UserPanel(), "Users");
-        contentPanel.add(new OfficePanel(), "Offices");
+        addPanels();
 
         cardLayout.show(contentPanel, "Dashboard");
 
@@ -128,7 +142,7 @@ public class ATSDashboardUI extends JFrame {
         pageTitle.setFont(new Font("Segoe UI", Font.BOLD, 34));
         pageTitle.setForeground(new Color(45, 45, 45));
 
-        JLabel userLabel = new JLabel("Administrator");
+        JLabel userLabel = new JLabel(roleID == 1 ? "Administrator" : "Staff");
         userLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         userLabel.setForeground(new Color(150, 0, 0));
 
@@ -318,7 +332,7 @@ public class ATSDashboardUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ATSDashboardUI().setVisible(true));
+        SwingUtilities.invokeLater(() -> new ATSDashboardUI(1).setVisible(true));
     }
 }
 
