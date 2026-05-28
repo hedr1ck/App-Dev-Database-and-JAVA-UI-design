@@ -142,7 +142,6 @@ public class ATSLoginUI extends JFrame {
     }
 
     private void loginAction() {
-
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
 
@@ -159,7 +158,7 @@ public class ATSLoginUI extends JFrame {
         try {
             java.sql.Connection conn = DatabaseConnection.getConnection();
 
-            String query = "SELECT * FROM users WHERE Email = ? AND Password = ?";
+            String query = "SELECT * FROM users WHERE Email = ? AND Password = ? AND Active = 1";
 
             java.sql.PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, email);
@@ -168,12 +167,14 @@ public class ATSLoginUI extends JFrame {
             java.sql.ResultSet rs = pst.executeQuery();
 
             if (rs.next()) {
-                new ATSDashboardUI().setVisible(true);
+                int roleID = rs.getInt("RoleID");
+
+                new ATSDashboardUI(roleID).setVisible(true);
                 this.dispose();
             } else {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Invalid email or password.",
+                        "Invalid email, password, or inactive account.",
                         "ATS Airline",
                         JOptionPane.ERROR_MESSAGE
                 );
