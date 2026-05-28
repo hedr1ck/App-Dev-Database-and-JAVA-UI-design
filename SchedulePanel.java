@@ -9,8 +9,15 @@ public class SchedulePanel extends JPanel {
     private DefaultTableModel model;
     private JTextField flightField, dateField;
     private JComboBox<String> departureBox, arrivalBox, sortBox;
+    private int roleID;
 
     public SchedulePanel() {
+        this(1);
+    }
+
+    public SchedulePanel(int roleID) {
+        this.roleID = roleID;
+
         setLayout(new BorderLayout(0, 20));
         setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
@@ -35,11 +42,13 @@ public class SchedulePanel extends JPanel {
 
         sortBox = new JComboBox<>(new String[]{"Date and Time", "Economy Price", "Confirmed"});
 
-        JButton searchButton = createButton("Search", new Color(220, 0, 0));
-        JButton refreshButton = createButton("Refresh", new Color(80, 80, 80));
-        JButton addButton = createButton("Add Flight", new Color(210, 0, 0));
-        JButton editButton = createButton("Edit Flight", new Color(150, 0, 0));
-        JButton cancelButton = createButton("Cancel Flight", new Color(35, 35, 35));
+        Color buttonColor = new Color(180, 0, 0);
+
+        JButton searchButton = createButton("Search", buttonColor);
+        JButton refreshButton = createButton("Refresh", buttonColor);
+        JButton addButton = createButton("Add Flight", buttonColor);
+        JButton editButton = createButton("Edit Flight", buttonColor);
+        JButton cancelButton = createButton("Cancel Flight", buttonColor);
 
         filterPanel.add(departureBox);
         filterPanel.add(arrivalBox);
@@ -48,9 +57,20 @@ public class SchedulePanel extends JPanel {
         filterPanel.add(sortBox);
         filterPanel.add(searchButton);
         filterPanel.add(refreshButton);
-        filterPanel.add(addButton);
-        filterPanel.add(editButton);
-        filterPanel.add(cancelButton);
+
+        if (roleID == 1) {
+            filterPanel.add(addButton);
+            filterPanel.add(editButton);
+            filterPanel.add(cancelButton);
+        } else {
+            JLabel staffMode = new JLabel("STAFF VIEW MODE", SwingConstants.CENTER);
+            staffMode.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            staffMode.setForeground(new Color(150, 0, 0));
+
+            filterPanel.add(staffMode);
+            filterPanel.add(new JLabel(""));
+            filterPanel.add(new JLabel(""));
+        }
 
         JPanel north = new JPanel(new BorderLayout(0, 20));
         north.setOpaque(false);
@@ -85,13 +105,17 @@ public class SchedulePanel extends JPanel {
         loadSchedules("");
 
         searchButton.addActionListener(e -> performSearch());
+
         refreshButton.addActionListener(e -> {
             clearFilters();
             loadSchedules("");
         });
-        addButton.addActionListener(e -> addFlight());
-        editButton.addActionListener(e -> editSelectedFlight());
-        cancelButton.addActionListener(e -> cancelSelectedFlight());
+
+        if (roleID == 1) {
+            addButton.addActionListener(e -> addFlight());
+            editButton.addActionListener(e -> editSelectedFlight());
+            cancelButton.addActionListener(e -> cancelSelectedFlight());
+        }
     }
 
     private JButton createButton(String text, Color color) {
